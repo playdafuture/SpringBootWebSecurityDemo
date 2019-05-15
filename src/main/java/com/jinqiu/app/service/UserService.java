@@ -6,5 +6,6 @@ import com.jinqiu.app.shared.dto.UserDTO;
 
 public interface UserService extends UserDetailsService {
 	UserDTO createUser(UserDTO user);
-	UserDTO getUser(String email);
+	UserDTO getUserByEmail(String email);
+	UserDTO getUserByUserId(String userId);
 }

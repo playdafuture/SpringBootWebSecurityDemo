@@ -7,5 +7,6 @@ import com.jinqiu.app.io.entity.UserEntity;;
 
 @Repository
 public interface UserRepository extends CrudRepository<UserEntity, Long> {
-	UserEntity findByEmail(String email);
+	UserEntity findByEmail(String email);	//query method:variable name must match db
+	UserEntity findByUserId(String userId);
 }
