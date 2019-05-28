@@ -46,6 +46,30 @@ public class UserServiceImpl implements UserService {
 		BeanUtils.copyProperties(storedUserDetails, returnValue);
 		return returnValue;
 	}
+	
+	@Override
+	public UserDTO updateUser(String userId, UserDTO user) {
+		UserEntity userEntity = userRepository.findByUserId(userId);
+		if (userEntity == null) {
+			throw new UsernameNotFoundException(userId + " does not exist");
+		}
+		userEntity.setFirstName(user.getFirstName());
+		userEntity.setLastName(user.getLastName());
+		UserEntity updatedEntity = userRepository.save(userEntity);
+		UserDTO returnValue = new UserDTO();
+		BeanUtils.copyProperties(updatedEntity, returnValue);
+		return returnValue;
+	}
+	
+	@Override
+	public boolean deleteUser(String userId) {
+		UserEntity userEntity = userRepository.findByUserId(userId);
+		if (userEntity == null) {
+			throw new UsernameNotFoundException(userId + " does not exist");
+		}
+		userRepository.delete(userEntity);
+		return true;
+	}
 
 	@Override
 	public UserDTO getUserByEmail(String email) {

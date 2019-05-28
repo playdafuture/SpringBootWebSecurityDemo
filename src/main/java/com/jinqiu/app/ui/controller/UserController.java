@@ -17,6 +17,9 @@ import com.jinqiu.app.service.UserService;
 import com.jinqiu.app.shared.dto.UserDTO;
 import com.jinqiu.app.ui.model.request.UserDetailsRequestModel;
 import com.jinqiu.app.ui.model.response.ErrorMessages;
+import com.jinqiu.app.ui.model.response.OperationStatusModel;
+import com.jinqiu.app.ui.model.response.RequestOperationName;
+import com.jinqiu.app.ui.model.response.RequestOperationStatus;
 import com.jinqiu.app.ui.model.response.UserRest;
 
 @RestController
@@ -27,7 +30,7 @@ public class UserController {
 
 	@GetMapping(path="/{userId}",
 				produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-	public UserRest getUser(@PathVariable String userId) {
+	public UserRest getUser(@PathVariable String userId) throws Exception {
 		UserRest returnValue = new UserRest();
 		UserDTO userDTO = userService.getUserByUserId(userId);
 		BeanUtils.copyProperties(userDTO, returnValue);
@@ -36,7 +39,7 @@ public class UserController {
 
 	@PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
 				 produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-	public UserRest createUser(@RequestBody UserDetailsRequestModel userDetails) throws Exception{
+	public UserRest createUser(@RequestBody UserDetailsRequestModel userDetails) throws Exception {
 		//Error Check
 		if (userDetails.getFirstName().isEmpty())
 			throw new UserServiceException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
@@ -50,13 +53,32 @@ public class UserController {
 		return returnValue;
 	}
 
-	@PutMapping
-	public String updateUser() {
-		return "update user was called";
+	@PutMapping(path="/{userId}",
+				consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
+			 	produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+	public UserRest updateUser(@PathVariable String userId, 
+							 @RequestBody UserDetailsRequestModel userDetails)
+									 								throws Exception {		
+		//Error Check
+		if (userDetails.getFirstName().isEmpty())
+			throw new UserServiceException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
+		
+		UserRest returnValue = new UserRest();
+		UserDTO dto = new UserDTO();
+		BeanUtils.copyProperties(userDetails, dto);
+
+		UserDTO updatedUser = userService.updateUser(userId, dto);
+		BeanUtils.copyProperties(updatedUser, returnValue);
+		return returnValue;
 	}
 
-	@DeleteMapping
-	public String deleteUser() {
-		return "delete user was called";
+	@DeleteMapping(path="/{userId}",				   
+				   produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+	public OperationStatusModel deleteUser(@PathVariable String userId) {
+		OperationStatusModel operationStatusModel = new OperationStatusModel();
+		operationStatusModel.setOperationName(RequestOperationName.DELETE.name());
+		userService.deleteUser(userId);
+		operationStatusModel.setOperationResult(RequestOperationStatus.SUCCESS.name());
+		return operationStatusModel;
 	}
 }
