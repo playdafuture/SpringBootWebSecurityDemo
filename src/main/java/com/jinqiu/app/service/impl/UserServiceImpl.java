@@ -1,9 +1,13 @@
 package com.jinqiu.app.service.impl;
 
+
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -98,6 +102,22 @@ public class UserServiceImpl implements UserService {
 		}
 		UserDTO returnValue = new UserDTO();
 		BeanUtils.copyProperties(userEntity, returnValue);
+		return returnValue;
+	}
+
+	@Override
+	public List<UserDTO> getUsers(int page, int limit) {
+		List<UserDTO> returnValue = new ArrayList<>();
+		Pageable pageableRequest = PageRequest.of(page, limit);
+		
+		List<UserEntity> queryResult = userRepository.findAll(pageableRequest).getContent();
+		
+		for (UserEntity ue: queryResult) {
+			UserDTO tempDto = new UserDTO();
+			BeanUtils.copyProperties(ue, tempDto);
+			returnValue.add(tempDto);
+		}
+		
 		return returnValue;
 	}
 

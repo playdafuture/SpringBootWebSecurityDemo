@@ -1,6 +1,7 @@
 HELP.md
 /target/
 !.mvn/wrapper/maven-wrapper.jar
+/personal_docs/
 
 ### STS ###
 .apt_generated
